@@ -1,6 +1,6 @@
 # nix-actions
 
-A collection of GitHub Actions for Nix dev/build environements.
+A collection of GitHub Actions for Nix dev/build environments.
 
 ## Included actions
 
