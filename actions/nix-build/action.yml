@@ -1,19 +1,22 @@
 name: Nix Build
-description: Build a flake attribute
+description: Build a flake package
 
 inputs:
   working-directory:
     description: Directory that contains the flake
     required: false
     default: .
-  attribute:
-    description: Flake attribute to build (for example .#default)
+
+  package:
+    description: Flake package to build (for example .#default)
     required: false
     default: .#default
+
   extra-args:
     description: Extra arguments passed to nix build
     required: false
     default: ""
+
   link-out-path:
     description: Keep ./result symlink (true) or build with --no-link (false)
     required: false
@@ -22,17 +25,19 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Build flake attribute
+    - name: Build flake package
       shell: bash
       env:
         LINK_OUT_PATH: ${{ inputs.link-out-path }}
+        EXTRA_ARGS: ${{ inputs.extra-args }}
+        PACKAGE: ${{ inputs.package }}
       working-directory: ${{ inputs.working-directory }}
       run: |
         set -euo pipefail
 
         no_link=""
-        if [ "$LINK_OUT_PATH" = "false" ]; then
+        if [[ "$LINK_OUT_PATH" == "false" ]]; then
           no_link="--no-link"
         fi
 
-        nix build "${{ inputs.attribute }}" --print-build-logs ${no_link} ${{ inputs.extra-args }}
+        nix build "$PACKAGE" --print-build-logs ${no_link} $EXTRA_ARGS

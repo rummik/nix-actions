@@ -6,6 +6,7 @@ inputs:
     description: Additional nix.conf lines
     required: false
     default: ""
+
   use-magic-cache:
     description: Whether to enable DeterminateSystems/magic-nix-cache-action
     required: false

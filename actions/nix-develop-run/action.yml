@@ -5,10 +5,12 @@ inputs:
   command:
     description: Command to run inside nix develop
     required: true
+
   working-directory:
     description: Directory that contains the flake
     required: false
     default: .
+
   devshell:
     description: Dev shell selector (empty means default)
     required: false

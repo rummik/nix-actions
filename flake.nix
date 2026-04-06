@@ -1,12 +1,14 @@
 {
-  description = "Description for the project";
+  description = "GitHub Actions and related templates for Nix projects";
 
   nixConfig = {
     extra-experimental-features = [ "nix-command" "flakes" ];
+
     extra-substituters = [
       "https://cache.nixos.org"
       "https://cache.flakehub.com"
     ];
+
     extra-trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbM4Nf4Q2wLk6LQj92t+6f6f7I="
       "cache.flakehub.com-3:hjuvDMLB9sMIf0ABFBb6/GfN5fNQnVg4M2DXrQ4hY8A="
@@ -36,21 +38,33 @@
 
         # Equivalent to  inputs'.nixpkgs.legacyPackages.hello;
         packages.default = pkgs.hello;
+
+        devShells.default = pkgs.mkShell {
+          packages = [
+            pkgs.nil
+            pkgs.actionlint
+            pkgs.act
+          ];
+        };
       };
+
       flake = {
         templates = {
           basic-ci = {
             path = ./templates/basic-ci;
             description = "Minimal flake with CI that runs flake check and default build via nix-actions";
           };
+
           devshell-ci = {
             path = ./templates/devshell-ci;
             description = "Flake with devshell formatting check and flake check via nix-actions";
           };
+
           release-ci = {
             path = ./templates/release-ci;
             description = "Flake with CI plus tag-triggered GitHub release workflow";
           };
+
           default = {
             path = ./templates/basic-ci;
             description = "Alias for basic-ci";
