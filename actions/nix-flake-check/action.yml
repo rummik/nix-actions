@@ -1,0 +1,22 @@
+name: Nix Flake Check
+description: Run nix flake check
+
+inputs:
+  working-directory:
+    description: Directory that contains the flake
+    required: false
+    default: .
+  extra-args:
+    description: Extra arguments passed to nix flake check
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Run flake checks
+      shell: bash
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+        nix flake check --print-build-logs ${{ inputs.extra-args }}

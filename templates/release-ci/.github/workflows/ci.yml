@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flake-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Checkout nix-actions
+        uses: actions/checkout@v6.0.2
+        with:
+          repository: rummik/nix-actions
+          ref: main
+          path: .nix-actions
+
+      - name: Setup Nix
+        uses: ./.nix-actions/actions/setup-nix
+        with:
+          use-magic-cache: "true"
+
+      - name: Run flake check
+        uses: ./.nix-actions/actions/nix-flake-check
+
+  build-default:
+    runs-on: ubuntu-latest
+    needs: flake-check
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Checkout nix-actions
+        uses: actions/checkout@v6.0.2
+        with:
+          repository: rummik/nix-actions
+          ref: main
+          path: .nix-actions
+
+      - name: Setup Nix
+        uses: ./.nix-actions/actions/setup-nix
+        with:
+          use-magic-cache: "true"
+
+      - name: Build default package
+        uses: ./.nix-actions/actions/nix-build
+        with:
+          attribute: .#default

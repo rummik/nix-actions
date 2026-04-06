@@ -1,0 +1,51 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  flake-check:
+    name: Flake Check (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Install Nix and enable cache
+        uses: ./actions/setup-nix
+        with:
+          use-magic-cache: "true"
+
+      - name: Run nix flake check
+        run: nix flake check --print-build-logs
+
+  build-default:
+    name: Build default package
+    runs-on: ubuntu-latest
+    needs: flake-check
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6.0.2
+
+      - name: Install Nix and enable cache
+        uses: ./actions/setup-nix
+        with:
+          use-magic-cache: "true"
+
+      - name: Build .#default
+        run: nix build .#default --print-build-logs --no-link

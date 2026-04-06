@@ -1,0 +1,12 @@
+name: Direnv Export
+description: Export environment variables from the direnv environment (.envrc) into GITHUB_ENV.
+
+runs:
+  using: composite
+  steps:
+    - name: Export direnv environment
+      shell: bash
+      run: |
+        set -euo pipefail
+        nix run nixpkgs#direnv -- allow .
+        nix run nixpkgs#direnv -- export gha >> "$GITHUB_ENV"

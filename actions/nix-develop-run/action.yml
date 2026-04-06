@@ -1,0 +1,33 @@
+name: Nix Develop Run
+description: Run a command in nix develop
+
+inputs:
+  command:
+    description: Command to run inside nix develop
+    required: true
+  working-directory:
+    description: Directory that contains the flake
+    required: false
+    default: .
+  devshell:
+    description: Dev shell selector (empty means default)
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Run command in dev shell
+      shell: bash
+      env:
+        USER_COMMAND: ${{ inputs.command }}
+        DEV_SHELL: ${{ inputs.devshell }}
+      working-directory: ${{ inputs.working-directory }}
+      run: |
+        set -euo pipefail
+
+        if [ -n "$DEV_SHELL" ]; then
+          nix develop "$DEV_SHELL" -c bash -lc "$USER_COMMAND"
+        else
+          nix develop -c bash -lc "$USER_COMMAND"
+        fi

@@ -1,0 +1,28 @@
+name: Setup Nix
+description: Setup Nix using DeterminateSystems and optionally enable Magic Nix Cache
+
+inputs:
+  extra-nix-config:
+    description: Additional nix.conf lines
+    required: false
+    default: ""
+  use-magic-cache:
+    description: Whether to enable DeterminateSystems/magic-nix-cache-action
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - name: Install Nix
+      uses: DeterminateSystems/nix-installer-action@v22
+      with:
+        github-token: ${{ github.token }}
+        extra-conf: |
+          accept-flake-config = true
+          experimental-features = nix-command flakes
+          ${{ inputs.extra-nix-config }}
+
+    - name: Enable magic Nix cache
+      if: ${{ inputs.use-magic-cache == 'true' }}
+      uses: DeterminateSystems/magic-nix-cache-action@v13
